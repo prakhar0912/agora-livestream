@@ -40,7 +40,7 @@ let App = () => {
         console.log(uid)
         setLocal({ ...local, uid: uid })
       }
-      else{
+      else {
         streamEventsInit()
       }
     }, (err) => { console.error(err) });
@@ -77,10 +77,11 @@ let App = () => {
 
 
     client.on('stream-subscribed', function (evt) {
-      let remoteStream = evt.stream;
-      let remoteId = remoteStream.getId();
-      console.log("Subscribe remote stream successfully: " + remoteId);
-      remoteStream.play('video');
+        let remoteStream = evt.stream;
+        let remoteId = remoteStream.getId();
+        console.log("Subscribe remote stream successfully: " + remoteId);
+        remoteStream.play('video');
+      
     });
 
 
@@ -88,6 +89,7 @@ let App = () => {
       let stream = evt.stream;
       stream.stop();
       stream.close();
+      setStart(false)
     });
 
     client.on('peer-leave', (e) => {
@@ -101,9 +103,11 @@ let App = () => {
   const leaveChannel = () => {
     client.leave(() => {
       if (role === 'host') {
+        console.log('here')
         local.camera.stream.stop()
         local.camera.stream.close();
         client.unpublish(local.camera.stream);
+        client.leave();
       }
       setStart(false)
     }, (err) => { console.error(err) });
@@ -111,7 +115,7 @@ let App = () => {
 
   return (
     <div className="App">
-      {start && <Video setStart={setStart} local={local} quit={leaveChannel} />}
+      {start && <Video setStart={setStart} local={local} quit={leaveChannel} role={role} />}
       {!start && <ChannelForm start={setStart} init={init} setRole={setRole} />}
     </div>
   );
@@ -123,23 +127,23 @@ const ChannelForm = ({ start, init, setRole }) => {
   return (
     <form className='join'>
       <input type="text" placeholder='Enter Channel Name' onChange={(e) => setChannelName(e.target.value)} />
-      <button onClick={(e) => { e.preventDefault(); setRole('host'); start(true); init(channelName, 'host');}}>Create Livestream</button>
-      <button onClick={(e) => { e.preventDefault(); setRole('audience'); start(true);  init(channelName, 'audience'); }}>Join Livestream</button>
+      <button onClick={(e) => { e.preventDefault(); setRole('host'); start(true); init(channelName, 'host'); }}>Create Livestream</button>
+      <button onClick={(e) => { e.preventDefault(); setRole('audience'); start(true); init(channelName, 'audience'); }}>Join Livestream</button>
     </form>
   );
 }
 
 
 
-const Video = ({ setStart, local, quit }) => {
+const Video = ({ setStart, local, quit, role }) => {
   return (
     <div id='video'>
-      <Controls setStart={setStart} local={local} quit={quit} />
+      <Controls setStart={setStart} local={local} quit={quit} role={role} />
     </div>
   )
 }
 
-const Controls = ({ setStart, local, quit }) => {
+const Controls = ({ setStart, local, quit, role }) => {
 
   const [audio, setAudio] = useState(true)
   const [video, setVideo] = useState(true)
@@ -160,8 +164,8 @@ const Controls = ({ setStart, local, quit }) => {
 
   return (
     <div className='controls'>
-      <p className={audio ? 'on' : ''} onClick={() => toggleMic()}>Mic</p>
-      <p className={video ? 'on' : ''} onClick={() => toggleVideo()}>Video</p>
+      {role === 'host' && <p className={audio ? 'on' : ''} onClick={() => toggleMic()}>Mic</p>}
+      {role === 'host' && <p className={video ? 'on' : ''} onClick={() => toggleVideo()}>Video</p>}
       <p onClick={() => { quit(); setStart(false) }}>Quit</p>
     </div>
   )
