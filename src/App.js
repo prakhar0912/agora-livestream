@@ -25,19 +25,17 @@ let App = () => {
   })
 
 
-  let init = (name) => {
+  let init = (name, sRole) => {
     client.init('26ec1c7ca4044efc8b2631858ba9eb35', () => {
-      joinChannel(name)
+      joinChannel(name, sRole)
     }, (err) => { console.log(err) });
   }
 
 
-  function joinChannel(channelName) {
-    client.setClientRole(role);
+  let joinChannel = (channelName, sRole) => {
+    client.setClientRole(sRole);
     client.join(null, channelName, null, (uid) => {
-      console.log(role)
-      if (role === 'host') {
-        console.log('cool')
+      if (sRole === 'host') {
         createCameraStream(uid, {});
         console.log(uid)
         setLocal({ ...local, uid: uid })
@@ -59,7 +57,6 @@ let App = () => {
     });
     console.log('here')
     localStream.init(() => {
-      console.log('cllo')
       localStream.play('video')
       client.publish(localStream, (err) => { console.error(err) })
       // localStreams.camera.stream = localStream
@@ -123,8 +120,8 @@ const ChannelForm = ({ start, init, setRole }) => {
   return (
     <form className='join'>
       <input type="text" placeholder='Enter Channel Name' onChange={(e) => setChannelName(e.target.value)} />
-      <button onClick={(e) => { e.preventDefault(); setRole('host'); start(true); init(channelName);}}>Create Livestream</button>
-      <button onClick={(e) => { e.preventDefault(); setRole('audience'); start(true);  init(channelName); }}>Join Livestream</button>
+      <button onClick={(e) => { e.preventDefault(); setRole('host'); start(true); init(channelName, 'host');}}>Create Livestream</button>
+      <button onClick={(e) => { e.preventDefault(); setRole('audience'); start(true);  init(channelName, 'audience'); }}>Join Livestream</button>
     </form>
   );
 }
