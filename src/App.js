@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import AgoraRTC from "agora-rtc-sdk"
 // import 'https://download.agora.io/sdk/release/AgoraRTC_N-4.2.1.js'
 
