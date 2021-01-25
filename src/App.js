@@ -27,7 +27,7 @@ let App = () => {
 
   let init = (name) => {
     client.init('26ec1c7ca4044efc8b2631858ba9eb35', () => {
-      joinChannel(name, role)
+      joinChannel(name)
     }, (err) => { console.log(err) });
   }
 
@@ -35,7 +35,9 @@ let App = () => {
   function joinChannel(channelName) {
     client.setClientRole(role);
     client.join(null, channelName, null, (uid) => {
+      console.log(role)
       if (role === 'host') {
+        console.log('cool')
         createCameraStream(uid, {});
         console.log(uid)
         setLocal({ ...local, uid: uid })
@@ -44,7 +46,7 @@ let App = () => {
   }
 
 
-  let createCameraStream = (uid, deviceIds) => {
+  let createCameraStream = (uid) => {
     let localStream = AgoraRTC.createStream({
       streamID: uid,
       audio: true,
@@ -118,12 +120,11 @@ let App = () => {
 const ChannelForm = ({ start, init, setRole }) => {
 
   const [channelName, setChannelName] = useState('')
-
   return (
     <form className='join'>
       <input type="text" placeholder='Enter Channel Name' onChange={(e) => setChannelName(e.target.value)} />
-      <button onClick={(e) => { e.preventDefault(); start(true); init(channelName); setRole('host') }}>Create Livestream</button>
-      <button onClick={(e) => { e.preventDefault(); start(true); init(channelName); setRole('audience') }}>Join Livestream</button>
+      <button onClick={(e) => { e.preventDefault(); setRole('host'); start(true); init(channelName);}}>Create Livestream</button>
+      <button onClick={(e) => { e.preventDefault(); setRole('audience'); start(true);  init(channelName); }}>Join Livestream</button>
     </form>
   );
 }
