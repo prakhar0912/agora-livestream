@@ -71,17 +71,20 @@ let App = () => {
 
   let streamEventsInit = () => {
     client.on('stream-added', (evt) => {
-      let stream = evt.stream;
-      client.subscribe(stream, (err) => { console.log(err) });
+      if (role !== 'host') {
+        let stream = evt.stream;
+        client.subscribe(stream, (err) => { console.log(err) });
+      }
     });
 
 
     client.on('stream-subscribed', function (evt) {
-        let remoteStream = evt.stream;
-        let remoteId = remoteStream.getId();
-        console.log("Subscribe remote stream successfully: " + remoteId);
-        remoteStream.play('video');
-      
+
+      let remoteStream = evt.stream;
+      let remoteId = remoteStream.getId();
+      console.log("Subscribe remote stream successfully: " + remoteId);
+      remoteStream.play('video');
+
     });
 
 
@@ -101,15 +104,13 @@ let App = () => {
   }
 
   const leaveChannel = () => {
-    client.leave(() => {
+    client.leave((evt) => {
       if (role === 'host') {
-        console.log('here')
         local.camera.stream.stop()
         local.camera.stream.close();
         client.unpublish(local.camera.stream);
-        client.leave();
+        setStart(false)
       }
-      setStart(false)
     }, (err) => { console.error(err) });
   }
 
