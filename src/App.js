@@ -40,6 +40,9 @@ let App = () => {
         console.log(uid)
         setLocal({ ...local, uid: uid })
       }
+      else{
+        streamEventsInit()
+      }
     }, (err) => { console.error(err) });
   }
 
