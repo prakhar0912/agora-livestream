@@ -39,8 +39,8 @@ body {
   background: rgba(0, 0, 0, 0.6);
   border-radius: 10px;
   z-index: 1;
-  min-width: 300px;
-  max-width: 90vw;
+  width: 300px;
+  max-width: 60vw;
 }
 
 .controls p{
@@ -68,8 +68,8 @@ body {
   background-color: #099dfd;
   padding: 30px;
   border-radius: 10px;
-  min-width: 500px;
-  max-width: 90vw;
+  width: 500px;
+  max-width: 75vw;
 }
 
 .join  input{
