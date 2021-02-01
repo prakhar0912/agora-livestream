@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import AgoraRTC from "agora-rtc-sdk"
 
-
 let App = () => {
 
   const [start, setStart] = useState(false)
@@ -24,6 +23,7 @@ let App = () => {
     role.current = Role
     setStart(true);
     client.init('26ec1c7ca4044efc8b2631858ba9eb35', () => {
+      streamEventsInit()
       joinChannel(name)
     }, (err) => { console.log(err) });
   }
@@ -33,7 +33,7 @@ let App = () => {
     client.setClientRole(role.current);
     client.join(null, channelName, null, (uid) => {
       if (role.current === 'host') {
-        createCameraStream(uid, {});
+        createCameraStream(uid);
         local.current.uid = uid
       }
       else {
@@ -51,15 +51,11 @@ let App = () => {
       screen: false
     });
     localStream.setVideoProfile('720p_6');
-    localStream.on("accessAllowed", function () {
-
-    });
+    localStream.on("accessAllowed", () => {});
     localStream.init(() => {
       localStream.play('video')
       client.publish(localStream, (err) => { console.error(err) })
       local.current.camera.stream = localStream
-      console.log('localStream', local.current)
-      streamEventsInit()
     }, (err) => { console.err(err) })
   }
 
@@ -78,21 +74,13 @@ let App = () => {
       });
     }
 
-
-
-
-
     client.on('stream-subscribed', function (evt) {
       let remoteStream = evt.stream;
       let remoteId = remoteStream.getId();
       console.log("Subscribe remote stream successfully: " + remoteId);
       remoteStream.play('video');
 
-    });
-
-
-    
-
+    })
     // client.on('peer-leave', (e) => {
     //   console.log('hrre')
     //   let stream = e.stream
@@ -132,16 +120,19 @@ const ChannelForm = ({ initFunc }) => {
       <button onClick={(e) => { e.preventDefault(); initFunc(channelName, 'audience'); }}>Join Livestream</button>
     </form>
   );
+
 }
 
 
 
 const Video = ({ local, quitFunc, role }) => {
+
   return (
     <div id='video'>
       <Controls local={local} quitFunc={quitFunc} role={role} />
     </div>
   )
+  
 }
 
 const Controls = ({ local, quitFunc, role }) => {
